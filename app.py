@@ -32,37 +32,60 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 EMAIL_MODEL_PATH = os.path.join(BASE_DIR, "phishnet_model.pkl")
 URL_MODEL_PATH = os.path.join(BASE_DIR, "url_model.pkl")
 
-# Google Drive FILE ID
-URL_MODEL_FILE_ID = "1hh9wldFW9V7YJSbfHRhUxDNoIjEnm01V"
+# Google Drive FILE IDs
+EMAIL_MODEL_FILE_ID = "1hh9wldFW9V7YJSbfHRhUxDNoIjEnm01V"
+URL_MODEL_FILE_ID = "18-1N5kDmJ4KSQ8F0WAGKk1DQ3e4YxiIG"
 
 email_model = None
 url_model = None
 
 
 # ===============================
+# FUNCTION: DOWNLOAD FILE
+# ===============================
+def download_from_drive(file_id, output_path, name):
+    try:
+        print(f"Downloading {name} from Google Drive...")
+        gdown.download(
+            f"https://drive.google.com/uc?id={file_id}",
+            output_path,
+            quiet=True
+        )
+        print(f"{name} downloaded successfully.")
+    except Exception as e:
+        print(f"Error downloading {name}: {e}")
+
+
+# ===============================
 # LOAD EMAIL MODEL
 # ===============================
+if not os.path.exists(EMAIL_MODEL_PATH):
+    download_from_drive(EMAIL_MODEL_FILE_ID, EMAIL_MODEL_PATH, "Email Model")
+
 if os.path.exists(EMAIL_MODEL_PATH):
-    print("Loading Email Model...")
-    email_model = joblib.load(EMAIL_MODEL_PATH)
+    try:
+        print("Loading Email Model...")
+        email_model = joblib.load(EMAIL_MODEL_PATH)
+        print("Email Model Loaded")
+    except Exception as e:
+        print("Error loading Email Model:", e)
 else:
     print("Email model not found!")
 
 
 # ===============================
-# DOWNLOAD + LOAD URL MODEL
+# LOAD URL MODEL
 # ===============================
 if not os.path.exists(URL_MODEL_PATH):
-    print("Downloading URL model from Google Drive...")
-    gdown.download(
-        f"https://drive.google.com/uc?id={URL_MODEL_FILE_ID}",
-        URL_MODEL_PATH,
-        quiet=False
-    )
+    download_from_drive(URL_MODEL_FILE_ID, URL_MODEL_PATH, "URL Model")
 
 if os.path.exists(URL_MODEL_PATH):
-    print("Loading URL Model...")
-    url_model = joblib.load(URL_MODEL_PATH)
+    try:
+        print("Loading URL Model...")
+        url_model = joblib.load(URL_MODEL_PATH)
+        print("URL Model Loaded")
+    except Exception as e:
+        print("Error loading URL Model:", e)
 else:
     print("URL model not found!")
 
@@ -200,7 +223,9 @@ def predict_url_route():
     })
 
 
+# ===============================
+# RUN APP (IMPORTANT FOR CLOUD)
+# ===============================
 if __name__ == "__main__":
-    app.run()
-
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
