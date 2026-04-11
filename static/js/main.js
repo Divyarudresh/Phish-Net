@@ -94,7 +94,9 @@
     }
 
     function showResult(data) {
-        const isSpam = data.is_spam;
+        const isSpam =
+            data.is_spam === true ||
+            data.prediction === "Spam";
         resultCard.className = "result-card visible " + (isSpam ? "spam" : "safe");
         resultCard.querySelector("#result-icon").innerHTML = isSpam ? spamIcon : safeIcon;
         resultCard.querySelector("#result-title").textContent = data.prediction;
