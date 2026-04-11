@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhishNet — Spam Email Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="noise"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+
+    <header class="header">
+        <div class="logo">
+            <svg class="logo-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" rx="8" fill="url(#logoGrad)"/>
+                <path d="M12 14h16v2H12v-2zm0 4h12v2H12v-2zm0 4h14v2H12v-2z" fill="white" opacity="0.9"/>
+                <path d="M28 26H12v-12l8 6 8-6v12z" stroke="white" stroke-width="1.5" fill="none"/>
+                <defs>
+                    <linearGradient id="logoGrad" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#00d4aa"/>
+                        <stop offset="1" stop-color="#0099ff"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <span class="logo-text">PhishNet</span>
+        </div>
+        <p class="tagline">AI-powered spam & phishing detection</p>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h1>Is this email or link safe?</h1>
+            <p>Upload an email, paste the content, or check a URL. Our models will analyze it instantly.</p>
+        </section>
+
+        <section class="url-section">
+            <h2 class="url-title">Quick URL check</h2>
+            <p class="url-subtitle">Paste a link to see whether it looks benign, phishing, malware, or defacement.</p>
+            <div class="url-card">
+                <input
+                    type="url"
+                    id="url-input"
+                    class="url-input"
+                    placeholder="https://example.com/login"
+                    spellcheck="false"
+                />
+                <button type="button" class="btn-url" id="url-analyze-btn">
+                    <span class="btn-url-text">Analyze URL</span>
+                    <span class="btn-url-loader"></span>
+                </button>
+            </div>
+            <div class="url-result" id="url-result">
+                <div class="url-badge" id="url-badge">—</div>
+                <div class="url-meta">
+                    <div class="url-label" id="url-label">No URL analyzed yet.</div>
+                    <div class="url-risk" id="url-risk"></div>
+                </div>
+            </div>
+            <div class="url-prob-table-wrap" id="url-prob-wrap">
+                <div class="url-prob-title">Probability breakdown</div>
+                <table class="url-prob-table" id="url-prob-table">
+                    <tbody id="url-prob-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="input-section">
+            <div class="tabs">
+                <button type="button" class="tab active" data-tab="upload">Upload File</button>
+                <button type="button" class="tab" data-tab="paste">Paste Text</button>
+            </div>
+
+            <div class="tab-content active" id="upload-panel">
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="file-input" accept=".eml,.txt" hidden>
+                    <div class="dropzone-inner">
+                        <svg class="dropzone-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M24 32V16M24 16l-6 6M24 16l6 6"/>
+                            <path d="M8 32h32v4a2 2 0 01-2 2H10a2 2 0 01-2-2v-4z"/>
+                        </svg>
+                        <p class="dropzone-text" id="dropzone-text">Drag & drop your email here</p>
+                        <p class="dropzone-hint" id="dropzone-hint">or click to browse — .eml, .txt supported</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="paste-panel">
+                <textarea id="email-text" placeholder="Paste your email content here...
+
+Example:
+Subject: Urgent - Verify your account
+From: support@example.com
+
+Dear Customer,
+Please click the link below to verify your account immediately..." rows="8"></textarea>
+            </div>
+
+            <button type="button" class="btn-analyze" id="analyze-btn">
+                <span class="btn-text">Analyze Email</span>
+                <span class="btn-loader"></span>
+            </button>
+        </div>
+
+        <section class="result-section" id="result-section">
+            <div class="result-card" id="result-card">
+                <div class="result-icon" id="result-icon"></div>
+                <h2 class="result-title" id="result-title">—</h2>
+                <p class="result-subtitle" id="result-subtitle">—</p>
+                <div class="result-bars" id="result-bars">
+                    <div class="bar-row">
+                        <span class="bar-label">Safe</span>
+                        <div class="bar-track"><div class="bar-fill bar-safe" id="safe-bar"></div></div>
+                        <span class="bar-value" id="safe-value">0%</span>
+                    </div>
+                    <div class="bar-row">
+                        <span class="bar-label">Spam</span>
+                        <div class="bar-track"><div class="bar-fill bar-spam" id="spam-bar"></div></div>
+                        <span class="bar-value" id="spam-value">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="error-toast" id="error-toast"></div>
+    </main>
+
+    <footer class="footer">
+        <p>PhishNet uses machine learning to detect spam and phishing emails. Always verify suspicious emails through official channels.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
